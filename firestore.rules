@@ -1,0 +1,92 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Helper functions
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isOwner(userId) {
+      return isSignedIn() && request.auth.uid == userId;
+    }
+
+    function incoming() {
+      return request.resource.data;
+    }
+
+    function existing() {
+      return resource.data;
+    }
+
+    function isValidId(id) {
+      return id is string && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
+    }
+
+    function isValidUserProfile(data) {
+      return data.keys().hasAll(['uid', 'email', 'fullName', 'mobile', 'targetExam']) &&
+             data.keys().size() <= 10 &&
+             data.uid is string && data.uid.size() <= 128 &&
+             data.email is string && data.email.size() <= 256 &&
+             data.fullName is string && data.fullName.size() <= 128 &&
+             data.mobile is string && data.mobile.size() <= 32 &&
+             data.targetExam is string && data.targetExam.size() <= 32;
+    }
+
+    // Default deny catch-all
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // Public Educational Collections: Read-only for authenticated students, writable only by system creators (allow write: if false)
+    match /subjects/{subjectId} {
+      allow get, list: if isSignedIn() && isValidId(subjectId);
+      allow write: if false;
+    }
+
+    match /chapters/{chapterId} {
+      allow get, list: if isSignedIn() && isValidId(chapterId);
+      allow write: if false;
+    }
+
+    match /notes/{noteId} {
+      allow get, list: if isSignedIn() && isValidId(noteId);
+      allow write: if false;
+    }
+
+    match /flashcards/{flashcardId} {
+      allow get, list: if isSignedIn() && isValidId(flashcardId);
+      allow write: if false;
+    }
+
+    match /mcqs/{mcqId} {
+      allow get, list: if isSignedIn() && isValidId(mcqId);
+      allow write: if false;
+    }
+
+    match /chapter_tests/{testId} {
+      allow get, list: if isSignedIn() && isValidId(testId);
+      allow write: if false;
+    }
+
+    match /daily_quiz/{quizId} {
+      allow get, list: if isSignedIn() && isValidId(quizId);
+      allow write: if false;
+    }
+
+    match /pyq_bank/{pyqId} {
+      allow get, list: if isSignedIn() && isValidId(pyqId);
+      allow write: if false;
+    }
+
+    // User Profile Collection: Managed by the corresponding user
+    match /user_profiles/{userId} {
+      allow get: if isSignedIn() && (isOwner(userId) || userId == 'admin');
+      allow list: if isSignedIn() && isOwner(userId);
+      allow create: if isOwner(userId) && isValidUserProfile(incoming()) && incoming().uid == request.auth.uid;
+      allow update: if isOwner(userId) && isValidUserProfile(incoming()) && incoming().uid == request.auth.uid &&
+                    incoming().diff(existing()).affectedKeys().hasOnly(['fullName', 'mobile', 'targetExam', 'experiencePoints', 'aiGuruMessageCount', 'lastActiveAt']);
+      allow delete: if false;
+    }
+  }
+}

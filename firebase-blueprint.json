@@ -1,0 +1,163 @@
+{
+  "entities": {
+    "Subject": {
+      "title": "Subject",
+      "description": "Educational subject like Child Development and Pedagogy (CDP)",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "description": "Unique identifier of the subject" },
+        "name": { "type": "string", "description": "Name of the subject" },
+        "code": { "type": "string", "description": "Subject academic code" },
+        "description": { "type": "string", "description": "Brief description of the subject" }
+      },
+      "required": ["id", "name", "code"]
+    },
+    "Chapter": {
+      "title": "Chapter",
+      "description": "Specific chapter within a subject containing rich textual and metadata content",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "subjectId": { "type": "string" },
+        "chapterNumber": { "type": "integer" },
+        "chapterTitle": { "type": "string" },
+        "chapterHindiTitle": { "type": "string" },
+        "summary": { "type": "string" },
+        "importantPoints": { "type": "array", "items": { "type": "string" } },
+        "oneLinerRevision": { "type": "array", "items": { "type": "string" } },
+        "weakTopicTags": { "type": "array", "items": { "type": "string" } }
+      },
+      "required": ["id", "subjectId", "chapterNumber", "chapterTitle", "chapterHindiTitle", "summary"]
+    },
+    "Note": {
+      "title": "Note",
+      "description": "Concise concept-oriented reference notes for revision",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "chapterId": { "type": "string" },
+        "title": { "type": "string" },
+        "content": { "type": "string" }
+      },
+      "required": ["id", "chapterId", "title", "content"]
+    },
+    "Flashcard": {
+      "title": "Flashcard",
+      "description": "Active recall study card",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "chapterId": { "type": "string" },
+        "question": { "type": "string" },
+        "answer": { "type": "string" }
+      },
+      "required": ["id", "chapterId", "question", "answer"]
+    },
+    "Mcq": {
+      "title": "Mcq",
+      "description": "Multiple choice question for practice",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "chapterId": { "type": "string" },
+        "question": { "type": "string" },
+        "options": { "type": "array", "items": { "type": "string" } },
+        "correctAnswer": { "type": "string" },
+        "explanation": { "type": "string" }
+      },
+      "required": ["id", "chapterId", "question", "options", "correctAnswer", "explanation"]
+    },
+    "ChapterTest": {
+      "title": "ChapterTest",
+      "description": "Test containing multiple choice questions for a specific chapter",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "chapterId": { "type": "string" },
+        "testTitle": { "type": "string" },
+        "questions": { "type": "array", "items": { "type": "object" } }
+      },
+      "required": ["id", "chapterId", "testTitle", "questions"]
+    },
+    "DailyQuiz": {
+      "title": "DailyQuiz",
+      "description": "Daily targeted quick evaluation",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "date": { "type": "string" },
+        "questions": { "type": "array" }
+      },
+      "required": ["id", "date", "questions"]
+    },
+    "PyqBank": {
+      "title": "PyqBank",
+      "description": "Previous Year Question repository",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "chapterId": { "type": "string" },
+        "question": { "type": "string" },
+        "options": { "type": "array", "items": { "type": "string" } },
+        "correctAnswer": { "type": "string" },
+        "explanation": { "type": "string" },
+        "examYear": { "type": "string" },
+        "examType": { "type": "string" }
+      },
+      "required": ["id", "chapterId", "question", "options", "correctAnswer", "examYear", "examType"]
+    },
+    "UserProfile": {
+      "title": "UserProfile",
+      "description": "User account configuration and performance metrics",
+      "type": "object",
+      "properties": {
+        "uid": { "type": "string" },
+        "email": { "type": "string" },
+        "fullName": { "type": "string" },
+        "mobile": { "type": "string" },
+        "targetExam": { "type": "string" },
+        "createdAt": { "type": "string" },
+        "experiencePoints": { "type": "integer" }
+      },
+      "required": ["uid", "email", "fullName", "mobile", "targetExam"]
+    }
+  },
+  "firestore": {
+    "/subjects/{subjectId}": {
+      "schema": "Subject",
+      "description": "Global list of physical examination subjects"
+    },
+    "/chapters/{chapterId}": {
+      "schema": "Chapter",
+      "description": "Child Dev chapters containing structured materials extracted from PDF"
+    },
+    "/notes/{noteId}": {
+      "schema": "Note",
+      "description": "Concept reference notes mapped to chapter"
+    },
+    "/flashcards/{flashcardId}": {
+      "schema": "Flashcard",
+      "description": "Flashcards database for spaced repetition"
+    },
+    "/mcqs/{mcqId}": {
+      "schema": "Mcq",
+      "description": "Question bank containing multiple choice items"
+    },
+    "/chapter_tests/{testId}": {
+      "schema": "ChapterTest",
+      "description": "Evaluation benchmarks of specific chapters"
+    },
+    "/daily_quiz/{quizId}": {
+      "schema": "DailyQuiz",
+      "description": "Global quick-evaluation challenge modules"
+    },
+    "/pyq_bank/{pyqId}": {
+      "schema": "PyqBank",
+      "description": "Repository of past UPTET/CTET exam items"
+    },
+    "/user_profiles/{userId}": {
+      "schema": "UserProfile",
+      "description": "User profiles database"
+    }
+  }
+}
